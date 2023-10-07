@@ -30,7 +30,9 @@ def get_catalog():
     first_row = blue_result.first()
     num_blue_potions = first_row.num_blue_potions
 
-
+    num_red_potions = 0
+    num_blue_potions= 0
+    num_green_potions = 0
     # Can return a max of 20 items --> is this 20 total? or 20 of each potion??.
     if num_red_potions > 8:
         num_red_potions = 8
