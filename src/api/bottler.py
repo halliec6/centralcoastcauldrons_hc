@@ -126,14 +126,14 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
     num_blue_ml = first_row.num_blue_ml
 
     #old plus new and update
+    new_num_red_ml = num_red_ml - (100 * new_num_red_potions)
     new_num_red_potions = new_num_red_potions + num_red_potions
-    new_num_red_ml = num_red_ml - (100 * num_red_potions)
 
+    new_num_green_ml = num_green_ml - (100 * new_num_green_potions)
     new_num_green_potions = new_num_green_potions + num_green_potions
-    new_num_green_ml = num_green_ml - (100 * num_green_potions)
-
+    
+    new_num_blue_ml = num_blue_ml - (100 * new_num_blue_potions)
     new_num_blue_potions = new_num_blue_potions + num_blue_potions
-    new_num_blue_ml = num_blue_ml - (100 * num_blue_potions)
 
     print("new ml ammounts")
     print("- new_num_red_potions: ", new_num_red_potions, "new_ml: ", new_num_red_ml)
