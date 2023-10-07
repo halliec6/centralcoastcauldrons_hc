@@ -55,22 +55,27 @@ def get_bottle_plan():
     print("red_potions to make: ", red_potions)
     print("green_potions to make: ", green_potions)
     print("blue_potions to make: ", blue_potions)
-
-    return [
-            {
+    
+    ans = []
+    if red_potions>0:
+        ans.append({
                 "potion_type": [100, 0, 0, 0],
                 "quantity": red_potions,
-            },
-            {
+            })
+    if green_potions>0:
+        ans.append( {
                 "potion_type": [0, 100, 0, 0],
                 "quantity": green_potions,
-            },
+            })
+    if blue_potions>0:
+        ans.append(
             {
                 "potion_type": [0, 0, 100, 0],
                 "quantity": blue_potions,
             }
-            
-        ]
+        )
+    
+    return ans
 
 @router.post("/deliver")
 def post_deliver_bottles(potions_delivered: list[PotionInventory]):
