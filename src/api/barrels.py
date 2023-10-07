@@ -26,6 +26,8 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     """ """
     #does this print statement stay? 
     #what is its purpose?
+    
+    print("\nIn barrels plan") 
     print(wholesale_catalog)
 
     with db.engine.begin() as connection:
@@ -56,9 +58,13 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     green_purchase = 0
     blue_purchase = 0 
 
-
-    #turn part w/in the if into a func
+    print("data pulled from server:")
+    print("gold: ", num_gold)
+    print("num_red_potions: ", num_red_potions)
+    print("num_gree_potions: ", num_green_potions)
+    print("num blue potions: ", num_blue_potions)
     
+    #turn part w/in the if into a func
     for barrel in wholesale_catalog:
         if barrel.sku == 'SMALL_RED_BARREL':
             #then calculate how many to purchase
@@ -73,9 +79,9 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             #want to buy one of ea so I don't blow my money all in one place
             if red_purchase > 1:
                 red_purchase = 1
-            
-            num_gold = (num_gold - barrel.price) * available
-        
+                
+                #needs to change once buying more than one barrel
+                num_gold = num_gold - barrel.price        
         elif barrel.sku == 'SMALL_GREEN_BARREL':
             
             available = barrel.quantity
@@ -87,9 +93,8 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 green_purchase = available 
 
             if green_purchase >1:
-                green_purchase = 1
-            
-            num_gold = (num_gold - barrel.price) * available
+                green_purchase = 1            
+                num_gold = num_gold - barrel.price
 
         elif barrel.sku == 'SMALL_BLUE_BARREL':
             available = barrel.quantity
@@ -102,12 +107,12 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
             if blue_purchase >1:
                 blue_purchase = 1
-            num_gold = (num_gold - barrel.price) * available
+                num_gold = num_gold - barrel.price
 
-        print("\nin barrels plan:")
-        print("- sku: SMALL_RED_BARREL    Quantity: ", red_purchase)
-        print("- sku: SMALL_GREEN_BARREL  Quantity: ", green_purchase)
-        print("- sku: SMALL_BLUE_BARREL   Quantity: ", blue_purchase)
+    print("\nreturn values:")
+    print("- sku: SMALL_RED_BARREL    Quantity: ", red_purchase)
+    print("- sku: SMALL_GREEN_BARREL  Quantity: ", green_purchase)
+    print("- sku: SMALL_BLUE_BARREL   Quantity: ", blue_purchase)
 
 
     return [
@@ -128,6 +133,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
     """ """
+    print("\nin barrels deliver")
     print(barrels_delivered)
     
     with db.engine.begin() as connection:
@@ -136,7 +142,6 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
         num_blue_ml = connection.execute(sqlalchemy.text("SELECT num_blue_ml FROM global_inventory"))
 
         num_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory"))
-
 
     #read from database red ml amount
     first_row = num_red_ml.first()
@@ -153,7 +158,13 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     #read from database gold amount
     first_row = num_gold.first()
     num_gold = first_row.gold
-
+    
+    print("Initial database values:")
+    print("num_gold: ", num_gold)
+    print("num_red_ml: ", num_red_ml)
+    print("num_green_ml: ", num_green_ml)
+    print("num_blue_ml: ", num_blue_ml)
+    
     spent_gold= 0
     new_red_ml = 0
     new_green_ml = 0
@@ -177,11 +188,12 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     num_green_ml = num_green_ml + new_green_ml
     num_blue_ml = num_blue_ml+ new_blue_ml
 
-    print("\nin barrels deliver")
+    print("calculations to upload to database:")
     print("- num_gold: ", num_gold)
     print("- num_red_ml: ", num_red_ml)
     print("- num_green_ml: ", num_green_ml)
     print("- num_blue_ml: ", num_blue_ml)
+    
     #do this at the end once you know the updated values
     with db.engine.begin() as connection: 
         connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold = :num_gold"), [{"num_gold": num_gold}])   
