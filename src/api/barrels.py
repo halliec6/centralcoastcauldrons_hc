@@ -115,20 +115,27 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     print("- sku: SMALL_BLUE_BARREL   Quantity: ", blue_purchase)
 
 
-    return [
-        {
+    ans = []
+
+    if red_purchase>0:
+        ans.append({
             "sku": "SMALL_RED_BARREL",
             "quantity": red_purchase,
-        },
-        {
+        })
+    if green_purchase>0:
+        ans.append({
             "sku": "SMALL_GREEN_BARREL",
             "quantity": green_purchase
-        },
+        })
+    if blue_purchase>0:
+        ans.append(
         {
             "sku": "SMALL_BLUE_BARREL",
             "quantity": blue_purchase
         }
-    ]
+        )
+
+    return ans
 
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
