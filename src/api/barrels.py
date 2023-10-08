@@ -67,21 +67,25 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     #turn part w/in the if into a func
     for barrel in wholesale_catalog:
         if barrel.sku == 'SMALL_RED_BARREL':
-            #then calculate how many to purchase
-            available = barrel.quantity
+            #don't want to buy more red, uncomment later
+            red_purchase = 0
 
-            red_purchase = num_gold//barrel.price
+
+            # #then calculate how many to purchase
+            # available = barrel.quantity
+
+            # red_purchase = num_gold//barrel.price
             
-            #can only buy what is available
-            if red_purchase>available:
-                red_purchase = available 
+            # #can only buy what is available
+            # if red_purchase>available:
+            #     red_purchase = available 
                 
-            #want to buy one of ea so I don't blow my money all in one place
-            if red_purchase > 1:
-                red_purchase = 1
+            # #want to buy one of ea so I don't blow my money all in one place
+            # if red_purchase > 1:
+            #     red_purchase = 1
                 
-                #needs to change once buying more than one barrel
-                num_gold = num_gold - barrel.price        
+            #     #needs to change once buying more than one barrel
+            #     num_gold = num_gold - barrel.price        
         elif barrel.sku == 'SMALL_GREEN_BARREL':
             
             available = barrel.quantity
