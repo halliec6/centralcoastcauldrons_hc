@@ -170,7 +170,6 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
     potion_sku = potion_info["sku"]
     cost = potions_bought*50
     
-    print("\nin checkout")
     print("cart_id: ", cart_id, "cart_checkout: ", cart_checkout, "sku: ", potion_sku)
     
     #update the database, subtract potions bought and quantity
