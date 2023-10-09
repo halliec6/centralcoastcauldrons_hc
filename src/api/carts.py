@@ -124,6 +124,10 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
             }
             return {"Success": True}
         else:
+            cart_dict[cart_id]= {
+                "sku": item_sku,
+                "quantity": 0
+            }
             return {"Success": False}
     
     
@@ -146,8 +150,9 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
 
     #subtract potion
     #subtract gold
-    potions_bought = cart_dict[cart_id]["quantity"]
-    potion_sku = cart_dict[cart_id]["sku"]
+    potion_info = get_cart(cart_id)
+    potions_bought = potion_info["quantity"]
+    potion_sku = potion_info["sku"]
     cost = potions_bought*50
     
     print("\nin checkout")
