@@ -40,7 +40,10 @@ def create_cart(new_cart: NewCart):
     global cart_dict
 
     
-    cart_dict[num_carts]= {}
+    cart_dict[num_carts]= {
+        "quantity": 0,
+        "sku": ""
+        }
 
     return {"cart_id": num_carts}
 
@@ -85,10 +88,12 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
         
         #if I have enough of what the customer wants, add it to their cart dict
         if num_red_potions>= cart_item.quantity:
-            cart_dict[cart_id] = {
-                "sku": item_sku,
-                "quantity": cart_item.quantity
-            }
+            # cart_dict[cart_id] = {
+            #     "sku": item_sku,
+            #     "quantity": cart_item.quantity
+            # }
+            cart_dict[cart_id]["sku"] = item_sku
+            cart_dict[cart_id]["quantity"] = cart_item.quantity
             return {"Success": True}
         else:
             return {"Success": False}
@@ -101,10 +106,8 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
         
         #if I have enough of what the customer wants, add it to their cart dict
         if num_green_potions>= cart_item.quantity:
-            cart_dict[cart_id] = {
-                "sku": item_sku,
-                "quantity": cart_item.quantity
-            }
+            cart_dict[cart_id]["sku"] = item_sku
+            cart_dict[cart_id]["quantity"] = cart_item.quantity
             return {"Success": True}
         else:
             return {"Success": False}
@@ -118,16 +121,14 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
         
         #if I have enough of what the customer wants, add it to their cart dict
         if num_blue_potions>= cart_item.quantity:
-            cart_dict[cart_id] = {
-                "sku": item_sku,
-                "quantity": cart_item.quantity
-            }
+            cart_dict[cart_id]["sku"] = item_sku
+            cart_dict[cart_id]["quantity"] = cart_item.quantity
             return {"Success": True}
         else:
-            cart_dict[cart_id]= {
-                "sku": item_sku,
-                "quantity": 0
-            }
+            # cart_dict[cart_id]= {
+            #     "sku": item_sku,
+            #     "quantity": 0
+            # }
             return {"Success": False}
     
     
