@@ -51,7 +51,7 @@ def get_catalog():
 
     if num_red_potions>0:
         ans.append({
-                "sku": "RED_POTION_0",
+                "sku": "SMALL_RED_POTION",
                 "name": "red potion",
                 "quantity": num_red_potions,
                 "price": 50,
@@ -59,7 +59,7 @@ def get_catalog():
             })
     if num_green_potions>0:
         ans.append({
-                "sku": "GREEN_POTION_0",
+                "sku": "SMALL_GREEN_POTION",
                 "name": "green potion",
                 "quantity": num_green_potions,
                 "price": 50,
@@ -67,7 +67,7 @@ def get_catalog():
             })
     if num_blue_potions>0:
         ans.append( {   
-                "sku": "BLUE_POTION_0",
+                "sku": "SMALL_BLUE_POTION",
                 "name": "blue potion",
                 "quantity": num_blue_potions,
                 "price": 50,
