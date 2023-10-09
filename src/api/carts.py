@@ -150,7 +150,10 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
 
     #subtract potion
     #subtract gold
+
     potion_info = get_cart(cart_id)
+    print("\nIN CHECKOUT\npotion_info:", potion_info)
+
     potions_bought = potion_info["quantity"]
     potion_sku = potion_info["sku"]
     cost = potions_bought*50
