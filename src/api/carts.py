@@ -179,7 +179,9 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                 total_potions = total_potions + current_cart[sku]
                 gold_spent = 50* current_cart[sku]
             else:
-                return False
+                return{
+                    "success": "False"
+                }
 
     gold = gold+gold_spent 
     #update database
@@ -187,7 +189,11 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
         connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold = :gold"), [{"gold": gold}])   
         connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_red_potions = :red_potions"), [{"red_potions": red_potions}])
     print("total_potions_bought: ", total_potions, "total_gold_paid: ", gold_spent)
-    return {"total_potions_bought": total_potions, "total_gold_paid": gold_spent}
+    
+    return {
+        "success": "True"
+    }
+    #return {"total_potions_bought": total_potions, "total_gold_paid": gold_spent}
     # potions_bought = cart_dict[cart_id]["quantity"]
     # potion_sku = cart_dict[cart_id]["sku"]
     # cost = potions_bought*50
