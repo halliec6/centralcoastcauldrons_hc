@@ -40,10 +40,7 @@ def create_cart(new_cart: NewCart):
     global cart_dict
 
     
-    cart_dict[num_carts]= {
-        "quantity": 0,
-        "sku": ""
-        }
+    cart_dict[num_carts]= {}
 
     return {"cart_id": num_carts}
 
@@ -71,76 +68,79 @@ class CartItem(BaseModel):
 def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
     """ """
     print("\nIN set item quantity")
-    print("cart_id: ", cart_id, "item_sku: ", item_sku, "amount: ", cart_item.quantity)
+    print("cart_id: ", cart_id, "item_sku: ", item_sku, "ammount: ", cart_item.quantity)
     
     global cart_dict
     #this is the customer saying what they want? then check database to see if available and add to CartItem
     
-    # num_red_potions = connection.execute(sqlalchemy.text("SELECT num_red_potions FROM global_inventory"))
-    #  connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold = :num_gold"), [{"num_gold": num_gold}])   
+    cart_dict[cart_id][item_sku] = cart_item.quantity
+
+    return {"Success": True}
+    # # num_red_potions = connection.execute(sqlalchemy.text("SELECT num_red_potions FROM global_inventory"))
+    # #  connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold = :num_gold"), [{"num_gold": num_gold}])   
     
-    #check the database for available items, if it is available 
-    if item_sku == "SMALL_RED_POTION":
-        with db.engine.begin() as connection:
-            num_red_potions = connection.execute(sqlalchemy.text("SELECT num_red_potions FROM global_inventory"))
-        first_row = num_red_potions.first()
-        num_red_potions = first_row.num_red_potions
+    # #check the database for available items, if it is available 
+    # if item_sku == "SMALL_RED_POTION":
+    #     with db.engine.begin() as connection:
+    #         num_red_potions = connection.execute(sqlalchemy.text("SELECT num_red_potions FROM global_inventory"))
+    #     first_row = num_red_potions.first()
+    #     num_red_potions = first_row.num_red_potions
         
-        #if I have enough of what the customer wants, add it to their cart dict
-        if num_red_potions>= cart_item.quantity:
-            # cart_dict[cart_id] = {
-            #     "sku": item_sku,
-            #     "quantity": cart_item.quantity
-            # }
-            cart_dict[cart_id]["sku"] = item_sku
-            cart_dict[cart_id]["quantity"] = cart_item.quantity
-            print("dictionary updated w red")
-            print(get_cart(cart_id))
+    #     #if I have enough of what the customer wants, add it to their cart dict
+    #     if num_red_potions>= cart_item.quantity:
+    #         # cart_dict[cart_id] = {
+    #         #     "sku": item_sku,
+    #         #     "quantity": cart_item.quantity
+    #         # }
+    #         cart_dict[cart_id]["sku"] = item_sku
+    #         cart_dict[cart_id]["quantity"] = cart_item.quantity
+    #         print("dictionary updated w red")
+    #         print(get_cart(cart_id))
 
-            return {"Success": True}
-        else:
-            return {"Success": False}
+    #         return {"Success": True}
+    #     else:
+    #         return {"Success": False}
     
-    elif item_sku == "SMALL_GREEN_POTION":
-        with db.engine.begin() as connection:
-            num_green_potions = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory"))
-        first_row = num_green_potions.first()
-        num_green_potions = first_row.num_green_potions
+    # elif item_sku == "SMALL_GREEN_POTION":
+    #     with db.engine.begin() as connection:
+    #         num_green_potions = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory"))
+    #     first_row = num_green_potions.first()
+    #     num_green_potions = first_row.num_green_potions
         
-        #if I have enough of what the customer wants, add it to their cart dict
-        if num_green_potions>= cart_item.quantity:
-            cart_dict[cart_id]["sku"] = item_sku
-            cart_dict[cart_id]["quantity"] = cart_item.quantity
+    #     #if I have enough of what the customer wants, add it to their cart dict
+    #     if num_green_potions>= cart_item.quantity:
+    #         cart_dict[cart_id]["sku"] = item_sku
+    #         cart_dict[cart_id]["quantity"] = cart_item.quantity
 
-            print("dictionary updated w green")
-            print(get_cart(cart_id))
+    #         print("dictionary updated w green")
+    #         print(get_cart(cart_id))
 
-            return {"Success": True}
-        else:
-            return {"Success": False}
+    #         return {"Success": True}
+    #     else:
+    #         return {"Success": False}
         
-    elif item_sku == "SMALL_BLUE_POTION":
+    # elif item_sku == "SMALL_BLUE_POTION":
         
-        with db.engine.begin() as connection:
-            num_blue_potions = connection.execute(sqlalchemy.text("SELECT num_blue_potions FROM global_inventory"))
-        first_row = num_blue_potions.first()
-        num_blue_potions = first_row.num_blue_potions
+    #     with db.engine.begin() as connection:
+    #         num_blue_potions = connection.execute(sqlalchemy.text("SELECT num_blue_potions FROM global_inventory"))
+    #     first_row = num_blue_potions.first()
+    #     num_blue_potions = first_row.num_blue_potions
         
-        #if I have enough of what the customer wants, add it to their cart dict
-        if num_blue_potions>= cart_item.quantity:
-            cart_dict[cart_id]["sku"] = item_sku
-            cart_dict[cart_id]["quantity"] = cart_item.quantity
+    #     #if I have enough of what the customer wants, add it to their cart dict
+    #     if num_blue_potions>= cart_item.quantity:
+    #         cart_dict[cart_id]["sku"] = item_sku
+    #         cart_dict[cart_id]["quantity"] = cart_item.quantity
             
-            print("dictionary updated w blue")
-            print(get_cart(cart_id))
+    #         print("dictionary updated w blue")
+    #         print(get_cart(cart_id))
 
-            return {"Success": True}
-        else:
-            # cart_dict[cart_id]= {
-            #     "sku": item_sku,
-            #     "quantity": 0
-            # }
-            return {"Success": False}
+    #         return {"Success": True}
+    #     else:
+    #         # cart_dict[cart_id]= {
+    #         #     "sku": item_sku,
+    #         #     "quantity": 0
+    #         # }
+    #         return {"Success": False}
     
     
     return "OK"
@@ -154,81 +154,103 @@ class CartCheckout(BaseModel):
 def checkout(cart_id: int, cart_checkout: CartCheckout):
     """ """
     global cart_dict
-    #cartID once again accesses through get cart
-    #cart_info = get_cart(cart_id)
     
-    
-    #modify database
+    current_cart = cart_dict[cart_id]
+    print("in checkout, current cart: ", current_cart)
+    for sku in current_cart:
+        #how to access SKU    print(list_item)
+        #how to access quanitity   print(current_cart[list_item])
 
-    #subtract potion
-    #subtract gold
-
-    potion_info = get_cart(cart_id)
-    print("\nIN CHECKOUT\npotion_info:", potion_info)
-
-    potions_bought = potion_info["quantity"]
-    potion_sku = potion_info["sku"]
-    cost = potions_bought*50
-    
-    print("cart_id: ", cart_id, "cart_checkout: ", cart_checkout, "sku: ", potion_sku)
-    
-    #update the database, subtract potions bought and quantity
-    if potion_sku == "SMALL_RED_POTION":
         with db.engine.begin() as connection:
-            num_red_potions = connection.execute(sqlalchemy.text("SELECT num_red_potions FROM global_inventory"))
-            num_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory"))
-
-        first_row = num_red_potions.first()
-        num_red_potions = first_row.num_red_potions
+            result = connection.execute(sqlalchemy.text("SELECT num_red_potions, num_green_potions, num_blue_potions, gold FROM global_inventory"))
         
-        first_row = num_gold.first()
-        num_gold = first_row.gold
+        first_row = result.first()
+        red_potions = first_row.num_red_potions
+    #     # green_potions = first_row.num_green_potions
+    #     # blue_potions = first_row.num_blue_potions
+        gold = first_row.num_blue_potions
 
-        new_gold = num_gold + cost
-        new_red_potions = num_red_potions - potions_bought
-        
-        with db.engine.begin() as connection: 
-            connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold = :new_gold"), [{"new_gold": new_gold}])   
-            connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_red_potions = :new_red_potions"), [{"new_red_potions": new_red_potions}])
+        total_potions, gold_spent = 0, 0
+        #check if enough red
+        if sku == "SMALL_RED_POTION":
+            #calculate if they have enough money and gold
+            if red_potions>=current_cart[sku]:
+                red_potions = red_potions - current_cart[sku]
+                total_potions = total_potions + current_cart[sku]
+                gold_spent = 50* current_cart[sku]
+            else:
+                return False
 
-    elif potion_sku == "SMALL_GREEN_POTION":
-        with db.engine.begin() as connection:
-            num_green_potions = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory"))
-            num_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory"))
-
-        first_row = num_green_potions.first()
-        num_green_potions = first_row.num_green_potions
-        
-        first_row = num_gold.first()
-        num_gold = first_row.gold
-
-        new_gold = num_gold + cost
-        new_green_potions = num_green_potions - potions_bought
-        
-        with db.engine.begin() as connection: 
-            connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold = :new_gold"), [{"new_gold": new_gold}])   
-            connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_green_potions = :new_green_potions"), [{"new_green_potions": new_green_potions}])
+    gold = gold+gold_spent 
+    #update database
+    with db.engine.begin() as connection: 
+        connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold = :gold"), [{"gold": gold}])   
+        connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_red_potions = :red_potions"), [{"red_potions": red_potions}])
+    print("total_potions_bought: ", total_potions, "total_gold_paid: ", gold_spent)
+    return {"total_potions_bought": total_potions, "total_gold_paid": gold_spent}
+    # potions_bought = cart_dict[cart_id]["quantity"]
+    # potion_sku = cart_dict[cart_id]["sku"]
+    # cost = potions_bought*50
     
-    elif potion_sku == "SMALL_BLUE_POTION":
-        with db.engine.begin() as connection:
-            num_blue_potions = connection.execute(sqlalchemy.text("SELECT num_blue_potions FROM global_inventory"))
-            num_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory"))
+    # print("cart_id: ", cart_id, "cart_checkout: ", cart_checkout, "sku: ", potion_sku)
+    
+    # #update the database, subtract potions bought and quantity
+    # if potion_sku == "SMALL_RED_POTION":
+    #     with db.engine.begin() as connection:
+    #         num_red_potions = connection.execute(sqlalchemy.text("SELECT num_red_potions FROM global_inventory"))
+    #         num_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory"))
 
-        first_row = num_blue_potions.first()
-        num_blue_potions = first_row.num_blue_potions
+    #     first_row = num_red_potions.first()
+    #     num_red_potions = first_row.num_red_potions
         
-        first_row = num_gold.first()
-        num_gold = first_row.gold
+    #     first_row = num_gold.first()
+    #     num_gold = first_row.gold
 
-        new_gold = num_gold + cost
-        new_blue_potions = num_blue_potions - potions_bought
+    #     new_gold = num_gold + cost
+    #     new_red_potions = num_red_potions - potions_bought
         
-        with db.engine.begin() as connection: 
-            connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold = :new_gold"), [{"new_gold": new_gold}])   
-            connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_blue_potions = :new_blue_potions"), [{"new_blue_potions": new_blue_potions}])
+    #     with db.engine.begin() as connection: 
+    #         connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold = :new_gold"), [{"new_gold": new_gold}])   
+    #         connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_red_potions = :new_red_potions"), [{"new_red_potions": new_red_potions}])
+
+    # elif potion_sku == "SMALL_GREEN_POTION":
+    #     with db.engine.begin() as connection:
+    #         num_green_potions = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory"))
+    #         num_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory"))
+
+    #     first_row = num_green_potions.first()
+    #     num_green_potions = first_row.num_green_potions
+        
+    #     first_row = num_gold.first()
+    #     num_gold = first_row.gold
+
+    #     new_gold = num_gold + cost
+    #     new_green_potions = num_green_potions - potions_bought
+        
+    #     with db.engine.begin() as connection: 
+    #         connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold = :new_gold"), [{"new_gold": new_gold}])   
+    #         connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_green_potions = :new_green_potions"), [{"new_green_potions": new_green_potions}])
+    
+    # elif potion_sku == "SMALL_BLUE_POTION":
+    #     with db.engine.begin() as connection:
+    #         num_blue_potions = connection.execute(sqlalchemy.text("SELECT num_blue_potions FROM global_inventory"))
+    #         num_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory"))
+
+    #     first_row = num_blue_potions.first()
+    #     num_blue_potions = first_row.num_blue_potions
+        
+    #     first_row = num_gold.first()
+    #     num_gold = first_row.gold
+
+    #     new_gold = num_gold + cost
+    #     new_blue_potions = num_blue_potions - potions_bought
+        
+    #     with db.engine.begin() as connection: 
+    #         connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold = :new_gold"), [{"new_gold": new_gold}])   
+    #         connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_blue_potions = :new_blue_potions"), [{"new_blue_potions": new_blue_potions}])
 
 
-    return {"total_potions_bought": potions_bought, "total_gold_paid": cost}
+    # 
 
 # from fastapi import APIRouter, Depends, Request
 # from pydantic import BaseModel
