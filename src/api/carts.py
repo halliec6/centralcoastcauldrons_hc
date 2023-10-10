@@ -166,9 +166,11 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
         
         first_row = result.first()
         red_potions = first_row.num_red_potions
+        green_potions = first_row.num_green_potions
+        blue_potions = first_row.num_blue_potions
     #     # green_potions = first_row.num_green_potions
     #     # blue_potions = first_row.num_blue_potions
-        gold = first_row.num_blue_potions
+        gold = first_row.gold
 
         total_potions, gold_spent = 0, 0
         #check if enough red
@@ -182,12 +184,34 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                 return{
                     "success": "False"
                 }
+        elif sku == "SMALL_GREEN_POTION":
+            #calculate if they have enough money and gold
+            if green_potions>=current_cart[sku]:
+                green_potions = green_potions - current_cart[sku]
+                total_potions = total_potions + current_cart[sku]
+                gold_spent = 50* current_cart[sku]
+            else:
+                return{
+                    "success": "False"
+                }
+        elif sku == "SMALL_BLUE_POTION":
+            if blue_potions>=current_cart[sku]:
+                blue_potions = blue_potions - current_cart[sku]
+                total_potions = total_potions + current_cart[sku]
+                gold_spent = 50* current_cart[sku]
+            else:
+                return{
+                    "success": "False"
+                }
 
     gold = gold+gold_spent 
     #update database
     with db.engine.begin() as connection: 
         connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold = :gold"), [{"gold": gold}])   
         connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_red_potions = :red_potions"), [{"red_potions": red_potions}])
+        connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_green_potions = :green_potions"), [{"green_potions": green_potions}])
+        connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_blue_potions = :blue_potions"), [{"blue_potions": blue_potions}])
+
     print("total_potions_bought: ", total_potions, "total_gold_paid: ", gold_spent)
     
     # return {
