@@ -156,7 +156,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
     global cart_dict
     
     current_cart = cart_dict[cart_id]
-    print("in checkout, current cart: ", current_cart)
+    print("in checkout, current cart: ", current_cart, "cart id: ", cart_id)
     for sku in current_cart:
         #how to access SKU    print(list_item)
         #how to access quanitity   print(current_cart[list_item])
@@ -212,7 +212,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
         connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_green_potions = :green_potions"), [{"green_potions": green_potions}])
         connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_blue_potions = :blue_potions"), [{"blue_potions": blue_potions}])
 
-    print("total_potions_bought: ", total_potions, "total_gold_paid: ", gold_spent)
+    print("cart_id: ", cart_id, "total_potions_bought: ", total_potions, "total_gold_paid: ", gold_spent)
     
     # return {
     #     "success": "True"
