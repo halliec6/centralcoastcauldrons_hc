@@ -31,46 +31,28 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     print(wholesale_catalog)
 
     with db.engine.begin() as connection:
-        num_red_potions = connection.execute(sqlalchemy.text("SELECT num_red_potions FROM global_inventory"))
-        num_green_potions = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory"))
-        num_blue_potions = connection.execute(sqlalchemy.text("SELECT num_blue_potions FROM global_inventory"))
-
-        num_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory"))
-
-    
-
-    #no idea about this stuff need to test a bunch but sleep time now
-    #read from database red potion amount
-    first_row = num_red_potions.first()
-    num_red_potions = first_row.num_red_potions
-
-    first_row = num_green_potions.first()
-    num_green_potions = first_row.num_green_potions
-
-    first_row = num_blue_potions.first()
-    num_blue_potions = first_row.num_blue_potions
-
-    #read from database gold amount
-    first_row = num_gold.first()
+        result = connection.execute(sqlalchemy.text("SELECT num_red_potions, num_blue_potions, num_green_potions, gold FROM global_inventory"))
+       
+    first_row = result.first()
+    red_potions = first_row.num_red_potions
+    green_potions = first_row.num_green_potions
+    blue_potions = first_row.num_blue_potions
     num_gold = first_row.gold
 
+   
     red_purchase = 0
     green_purchase = 0
     blue_purchase = 0 
 
     print("data pulled from server:")
     print("gold: ", num_gold)
-    print("num_red_potions: ", num_red_potions)
-    print("num_gree_potions: ", num_green_potions)
-    print("num blue potions: ", num_blue_potions)
+    print("num_red_potions: ", red_potions)
+    print("num_gree_potions: ", green_potions)
+    print("num blue potions: ", blue_potions)
     
     #turn part w/in the if into a func
     for barrel in wholesale_catalog:
         if barrel.sku == 'SMALL_RED_BARREL':
-            #don't want to buy more red, uncomment later
-            #red_purchase = 0
-
-
             #then calculate how many to purchase
             available = barrel.quantity
 
@@ -121,6 +103,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
     ans = []
 
+    #probably should add the array [0,0,...]
     if red_purchase>0:
         ans.append({
             "sku": "SMALL_RED_BARREL",
@@ -144,31 +127,17 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
     """ """
-    print("\nin barrels deliver")
+    print("\nin barrels deliver: planning to buy")
     print(barrels_delivered)
     
     with db.engine.begin() as connection:
-        num_red_ml = connection.execute(sqlalchemy.text("SELECT num_red_ml FROM global_inventory"))
-        num_green_ml = connection.execute(sqlalchemy.text("SELECT num_green_ml FROM global_inventory"))
-        num_blue_ml = connection.execute(sqlalchemy.text("SELECT num_blue_ml FROM global_inventory"))
-
-        num_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory"))
-
-    #read from database red ml amount
-    first_row = num_red_ml.first()
+        result = connection.execute(sqlalchemy.text("SELECT num_red_ml, num_red_ml, num_blue_ml, gold FROM global_inventory"))
+       
+    first_row = result.first()
     num_red_ml = first_row.num_red_ml
-
-    #read from database greem ml amount
-    first_row = num_green_ml.first()
     num_green_ml = first_row.num_green_ml
-
-    #read from database greem ml amount
-    first_row = num_blue_ml.first()
     num_blue_ml = first_row.num_blue_ml
-    
-    #read from database gold amount
-    first_row = num_gold.first()
-    num_gold = first_row.gold
+    gold = first_row.gold
     
     print("Initial database values:")
     print("num_gold: ", num_gold)
@@ -192,14 +161,20 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
             new_green_ml = new_green_ml + (barrel.ml_per_barrel * barrel.quantity)
         elif barrel.sku == "SMALL_BLUE_BARREL":
             new_blue_ml = new_blue_ml + (barrel.ml_per_barrel * barrel.quantity)
-           
+    
+    print("\nwhat was purchased in barrels delivered:")
+    print("num gold spent ", num_gold)
+    print("num_red_ml bought: ", new_red_ml)
+    print("num_green_ml bought: ", new_green_ml)
+    print("num_blue_ml bought: ", new_blue_ml)  
+    
     #make final calculations
     num_gold = num_gold - spent_gold
     num_red_ml = num_red_ml + new_red_ml
     num_green_ml = num_green_ml + new_green_ml
     num_blue_ml = num_blue_ml+ new_blue_ml
 
-    print("calculations to upload to database:")
+    print("\ncalculations to upload to database:")
     print("- num_gold: ", num_gold)
     print("- num_red_ml: ", num_red_ml)
     print("- num_green_ml: ", num_green_ml)
@@ -215,21 +190,3 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     #does this stay as the return value?
     return "OK"
 
-
-"""
-    if num_red_potions>10:
-        red_purchase = 0
-    else:
-
-        #modify later when adding multiple colors
-        for barrel in wholesale_catalog:
-            if barrel.sku == 'SMALL_RED_BARREL':
-                #then calculate how many to purchase
-                available = barrel.quantity
-
-                red_purchase = num_gold//barrel.price
-                
-                #can only buy what is available
-                if red_purchase>available:
-                    red_purchase = available   
-    """ 
