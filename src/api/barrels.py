@@ -131,13 +131,13 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     print(barrels_delivered)
     
     with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text("SELECT num_red_ml, num_red_ml, num_blue_ml, gold FROM global_inventory"))
+        result = connection.execute(sqlalchemy.text("SELECT num_red_ml, num_green_ml, num_blue_ml, gold FROM global_inventory"))
        
     first_row = result.first()
     num_red_ml = first_row.num_red_ml
     num_green_ml = first_row.num_green_ml
     num_blue_ml = first_row.num_blue_ml
-    gold = first_row.gold
+    num_gold = first_row.gold
     
     print("Initial database values:")
     print("num_gold: ", num_gold)
