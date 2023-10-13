@@ -32,20 +32,16 @@ def get_bottle_plan():
 
     #pull data from the Supabase
     with db.engine.begin() as connection:
-        num_red_ml = connection.execute(sqlalchemy.text("SELECT num_red_ml FROM global_inventory"))
-        num_green_ml = connection.execute(sqlalchemy.text("SELECT num_green_ml FROM global_inventory"))
-        num_blue_ml = connection.execute(sqlalchemy.text("SELECT num_blue_ml FROM global_inventory"))
-
-
+        #num_red_ml = connection.execute(sqlalchemy.text("SELECT num_red_ml FROM global_inventory"))
+        #num_green_ml = connection.execute(sqlalchemy.text("SELECT num_green_ml FROM global_inventory"))
+        #num_blue_ml = connection.execute(sqlalchemy.text("SELECT num_blue_ml FROM global_inventory"))
+        result = connection.execute(sqlalchemy.text("SELECT num_red_ml, num_green_ml, num_blue_ml FROM global_inventory"))
     #read from database red potion amount
-    first_row = num_red_ml.first()
+    first_row = result.first()
     num_red_ml = first_row.num_red_ml
-
-    first_row = num_green_ml.first()
+    num_blue_ml = first_row.num_blue_ml
     num_green_ml = first_row.num_green_ml
 
-    first_row = num_blue_ml.first()
-    num_blue_ml = first_row.num_blue_ml
 
     red_potions = num_red_ml//100
     green_potions = num_green_ml//100
@@ -96,38 +92,16 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
 
     
     with db.engine.begin() as connection:
-        num_red_potions = connection.execute(sqlalchemy.text("SELECT num_red_potions FROM global_inventory"))
-        num_red_ml = connection.execute(sqlalchemy.text("SELECT num_red_ml FROM global_inventory"))
+        result = connection.execute(sqlalchemy.text("SELECT num_red_potions, num_red_ml, num_green_potions, num_green_ml, num_blue_potions, num_blue_ml FROM global_inventory"))
         
-        #need to add full logic for green and blue potions
-        num_green_potions = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory"))
-        num_green_ml = connection.execute(sqlalchemy.text("SELECT num_green_ml FROM global_inventory"))
-        
-        num_blue_potions = connection.execute(sqlalchemy.text("SELECT num_blue_potions FROM global_inventory"))
-        num_blue_ml = connection.execute(sqlalchemy.text("SELECT num_blue_ml FROM global_inventory"))
-
-
     
     #read from database red potion amount
-    first_row = num_red_potions.first()
+    first_row = result.first()
     num_red_potions = first_row.num_red_potions
-
-    first_row = num_green_potions.first()
     num_green_potions = first_row.num_green_potions
-
-    first_row = num_blue_potions.first()
     num_blue_potions = first_row.num_blue_potions
-
-    #read from database the red ml ammount
-    first_row = num_red_ml.first()
     num_red_ml = first_row.num_red_ml
-
-    #read from database the red ml ammount
-    first_row = num_green_ml.first()
     num_green_ml = first_row.num_green_ml
-
-    #read from database the red ml ammount
-    first_row = num_blue_ml.first()
     num_blue_ml = first_row.num_blue_ml
 
     #old plus new and update
