@@ -55,18 +55,18 @@ def get_bottle_plan():
     ans = []
     if red_potions>0:
         ans.append({
-                "potion_type": [1, 0, 0, 0],
+                "potion_type": [100, 0, 0, 0],
                 "quantity": red_potions,
             })
     if green_potions>0:
         ans.append( {
-                "potion_type": [0, 1, 0, 0],
+                "potion_type": [0, 100, 0, 0],
                 "quantity": green_potions,
             })
     if blue_potions>0:
         ans.append(
             {
-                "potion_type": [0, 0, 1, 0],
+                "potion_type": [0, 0, 100, 0],
                 "quantity": blue_potions,
             }
         )
@@ -83,11 +83,11 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
     new_num_red_potions, new_num_green_potions, new_num_blue_potions = 0, 0, 0
 
     for potion in potions_delivered:
-        if potion.potion_type == [1, 0,0,0]:
+        if potion.potion_type == [100, 0,0,0]:
             new_num_red_potions = new_num_red_potions + potion.quantity
-        elif potion.potion_type == [0, 1, 0, 0]:
+        elif potion.potion_type == [0, 100, 0, 0]:
             new_num_green_potions = new_num_green_potions + potion.quantity
-        elif potion.potion_type == [0, 0, 1, 0]:
+        elif potion.potion_type == [0, 0, 100, 0]:
             new_num_blue_potions = new_num_blue_potions + potion.quantity
 
     
