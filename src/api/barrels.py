@@ -56,18 +56,18 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             #then calculate how many to purchase
             available = barrel.quantity
 
-            red_purchase = num_gold//barrel.price
+            # red_purchase = num_gold//barrel.price
             
-            #can only buy what is available
-            if red_purchase>available:
-                red_purchase = available 
+            # #can only buy what is available
+            # if red_purchase>available:
+            #     red_purchase = available 
                 
-            #want to buy one of ea so I don't blow my money all in one place
-            if red_purchase >= 1:
-                red_purchase = 1
+            # #want to buy one of ea so I don't blow my money all in one place
+            # if red_purchase >= 1:
+            #     red_purchase = 1
                 
-                #needs to change once buying more than one barrel
-                num_gold = num_gold - barrel.price        
+            #     #needs to change once buying more than one barrel
+            #     num_gold = num_gold - barrel.price        
         elif barrel.sku == 'SMALL_GREEN_BARREL':
             
             available = barrel.quantity
@@ -134,13 +134,13 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 
     for barrel_delivered in barrels_delivered:
         gold_paid+= barrel_delivered.price*barrel_delivered.quantity
-        if barrel_delivered.potion_type == [1, 0, 0, 0]:
+        if barrel_delivered.potion_type == [100, 0, 0, 0]:
             red_ml += barrel_delivered.ml_per_barrel *barrel_delivered.quantity
-        elif barrel_delivered.potion_type == [0, 1, 0, 0]:
+        elif barrel_delivered.potion_type == [0, 100, 0, 0]:
             green_ml += barrel_delivered.ml_per_barrel *barrel_delivered.quantity
-        elif barrel_delivered.potion_type == [0, 0, 1, 0]:
+        elif barrel_delivered.potion_type == [0, 0, 100, 0]:
             blue_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
-        elif barrel_delivered.potion_type == [0, 0, 0, 1]:
+        elif barrel_delivered.potion_type == [0, 0, 0, 100]:
             dark_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
         else:
             raise Exception("Invalid potion type")
