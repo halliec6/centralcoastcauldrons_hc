@@ -63,7 +63,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 red_purchase = available 
                 
             #want to buy one of ea so I don't blow my money all in one place
-            if red_purchase > 1:
+            if red_purchase >= 1:
                 red_purchase = 1
                 
                 #needs to change once buying more than one barrel
@@ -78,7 +78,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             if green_purchase>available:
                 green_purchase = available 
 
-            if green_purchase >1:
+            if green_purchase >=1:
                 green_purchase = 1            
                 num_gold = num_gold - barrel.price
 
@@ -91,7 +91,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             if blue_purchase>available:
                 blue_purchase = available 
 
-            if blue_purchase >1:
+            if blue_purchase >=1:
                 blue_purchase = 1
                 num_gold = num_gold - barrel.price
 
