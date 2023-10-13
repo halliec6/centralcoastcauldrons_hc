@@ -121,7 +121,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             "quantity": blue_purchase
         }
         )
-
+    print("return value of bottler plan: ", ans)
     return ans
 
 @router.post("/deliver")
