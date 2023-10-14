@@ -129,7 +129,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     """ """
     print("\nin barrels deliver: planning to buy")
     print(barrels_delivered)
-    
+    print("updated")
     gold_paid, red_ml, blue_ml, green_ml, dark_ml = 0, 0, 0, 0, 0
 
     for barrel_delivered in barrels_delivered:
