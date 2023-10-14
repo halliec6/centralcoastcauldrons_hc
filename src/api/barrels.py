@@ -129,16 +129,15 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     """ """
     print("\nin barrels deliver: planning to buy")
     print(barrels_delivered)
-    print("updated")
     gold_paid, red_ml, blue_ml, green_ml, dark_ml = 0, 0, 0, 0, 0
 
     for barrel_delivered in barrels_delivered:
         gold_paid+= barrel_delivered.price*barrel_delivered.quantity
-        if barrel_delivered.potion_type == [100, 0, 0, 0]:
+        if barrel_delivered.sku == "SMALL_RED_BARREL":
             red_ml += barrel_delivered.ml_per_barrel *barrel_delivered.quantity
-        elif barrel_delivered.potion_type == [0, 100, 0, 0]:
+        elif barrel_delivered.sku == "SMALL_GREEN_BARREL":
             green_ml += barrel_delivered.ml_per_barrel *barrel_delivered.quantity
-        elif barrel_delivered.potion_type == [0, 0, 100, 0]:
+        elif barrel_delivered.sku == "SMALL_BLUE_BARREL":
             blue_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
         elif barrel_delivered.potion_type == [0, 0, 0, 100]:
             dark_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
