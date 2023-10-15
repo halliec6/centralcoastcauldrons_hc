@@ -56,18 +56,18 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             #then calculate how many to purchase
             available = barrel.quantity
 
-            # red_purchase = num_gold//barrel.price
+            red_purchase = num_gold//barrel.price
             
-            # #can only buy what is available
-            # if red_purchase>available:
-            #     red_purchase = available 
+            #can only buy what is available
+            if red_purchase>available:
+                red_purchase = available 
                 
-            # #want to buy one of ea so I don't blow my money all in one place
-            # if red_purchase >= 1:
-            #     red_purchase = 1
+            #want to buy one of ea so I don't blow my money all in one place
+            if red_purchase >= 1:
+                red_purchase = 1
                 
-            #     #needs to change once buying more than one barrel
-            #     num_gold = num_gold - barrel.price        
+                #needs to change once buying more than one barrel
+                num_gold = num_gold - barrel.price        
         elif barrel.sku == 'SMALL_GREEN_BARREL':
             
             available = barrel.quantity
@@ -103,7 +103,6 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
     ans = []
 
-    #probably should add the array [0,0,...]
     if red_purchase>0:
         ans.append({
             "sku": "SMALL_RED_BARREL",
@@ -157,72 +156,5 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
                 """),
             [{"gold_paid": gold_paid, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml}]
         )
-    #does this stay as the return value?
     return "OK"
-
-# @router.post("/deliver")
-# def post_deliver_barrels(barrels_delivered: list[Barrel]):
-#     """ """
-#     print("\nin barrels deliver: planning to buy")
-#     print(barrels_delivered)
-    
-#     with db.engine.begin() as connection:
-#         result = connection.execute(sqlalchemy.text("SELECT num_red_ml, num_green_ml, num_blue_ml, gold FROM global_inventory"))
-       
-#     first_row = result.first()
-#     num_red_ml = first_row.num_red_ml
-#     num_green_ml = first_row.num_green_ml
-#     num_blue_ml = first_row.num_blue_ml
-#     num_gold = first_row.gold
-    
-#     print("Initial database values:")
-#     print("num_gold: ", num_gold)
-#     print("num_red_ml: ", num_red_ml)
-#     print("num_green_ml: ", num_green_ml)
-#     print("num_blue_ml: ", num_blue_ml)
-    
-#     spent_gold= 0
-#     new_red_ml = 0
-#     new_green_ml = 0
-#     new_blue_ml = 0
-
-#     #iterate through list and calculate money spent and mL gained
-#     for barrel in barrels_delivered:
-        
-#         spent_gold = spent_gold + (barrel.price * barrel.quantity)
-
-#         if barrel.sku == "SMALL_RED_BARREL":
-#             new_red_ml = new_red_ml + (barrel.ml_per_barrel * barrel.quantity) #not sure if 10 is the right mL or not
-#         elif barrel.sku == "SMALL_GREEN_BARREL":
-#             new_green_ml = new_green_ml + (barrel.ml_per_barrel * barrel.quantity)
-#         elif barrel.sku == "SMALL_BLUE_BARREL":
-#             new_blue_ml = new_blue_ml + (barrel.ml_per_barrel * barrel.quantity)
-    
-#     print("\nwhat was purchased in barrels delivered:")
-#     print("num gold spent ", num_gold)
-#     print("num_red_ml bought: ", new_red_ml)
-#     print("num_green_ml bought: ", new_green_ml)
-#     print("num_blue_ml bought: ", new_blue_ml)  
-    
-#     #make final calculations
-#     num_gold = num_gold - spent_gold
-#     num_red_ml = num_red_ml + new_red_ml
-#     num_green_ml = num_green_ml + new_green_ml
-#     num_blue_ml = num_blue_ml+ new_blue_ml
-
-#     print("\ncalculations to upload to database:")
-#     print("- num_gold: ", num_gold)
-#     print("- num_red_ml: ", num_red_ml)
-#     print("- num_green_ml: ", num_green_ml)
-#     print("- num_blue_ml: ", num_blue_ml)
-    
-#     #do this at the end once you know the updated values
-#     with db.engine.begin() as connection: 
-#         connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold = :num_gold"), [{"num_gold": num_gold}])   
-#         connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_red_ml = :num_red_ml"), [{"num_red_ml": num_red_ml}])
-#         connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_green_ml = :num_green_ml"), [{"num_green_ml": num_green_ml}])
-#         connection.execute(sqlalchemy.text("UPDATE global_inventory SET num_blue_ml = :num_blue_ml"), [{"num_blue_ml": num_blue_ml}])
-
-#     #does this stay as the return value?
-#     return "OK"
 
