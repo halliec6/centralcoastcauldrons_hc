@@ -87,10 +87,7 @@ def get_bottle_plan():
                 "quantity": num_blue_ml//100,
             }
         )
-    print("after subtraction ml:")
-    print("red_ml: ", num_red_ml)
-    print("green_ml: ", num_green_ml)
-    print("blue_ml: ", num_blue_ml)
+    
     return ans
 
 @router.post("/deliver")
