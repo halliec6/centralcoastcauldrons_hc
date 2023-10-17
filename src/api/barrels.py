@@ -31,12 +31,11 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     print(wholesale_catalog)
 
     with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text("SELECT num_red_potions, num_blue_potions, num_green_potions, gold FROM global_inventory"))
+        result = connection.execute(
+            sqlalchemy.text(
+                "SELECT gold FROM global_inventory"))
        
     first_row = result.first()
-    red_potions = first_row.num_red_potions
-    green_potions = first_row.num_green_potions
-    blue_potions = first_row.num_blue_potions
     num_gold = first_row.gold
 
    
@@ -46,10 +45,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
     print("data pulled from server:")
     print("gold: ", num_gold)
-    print("num_red_potions: ", red_potions)
-    print("num_gree_potions: ", green_potions)
-    print("num blue potions: ", blue_potions)
-    
+   
     #turn part w/in the if into a func
     for barrel in wholesale_catalog:
         if barrel.sku == 'SMALL_RED_BARREL':
