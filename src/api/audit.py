@@ -15,39 +15,37 @@ router = APIRouter(
 def get_inventory():
     """ """
     with db.engine.begin() as connection:
-        num_red_ml = connection.execute(sqlalchemy.text("SELECT num_red_ml FROM global_inventory"))
-        num_red_potions = connection.execute(sqlalchemy.text("SELECT num_red_potions FROM global_inventory"))
-        gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory"))
-        num_green_potions = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory"))
-        num_green_ml = connection.execute(sqlalchemy.text("SELECT num_green_ml FROM global_inventory"))
-        num_blue_potions = connection.execute(sqlalchemy.text("SELECT num_blue_potions FROM global_inventory"))
-        num_blue_ml = connection.execute(sqlalchemy.text("SELECT num_blue_ml FROM global_inventory"))
-
-    first_row = num_red_ml.first()
-    num_red_ml = first_row.num_red_ml
-
-    first_row = num_green_ml.first()
-    num_green_ml = first_row.num_green_ml
-
-    first_row = num_blue_ml.first()
-    num_blue_ml = first_row.num_blue_ml
-
-    first_row = num_red_potions.first()
-    num_red_potions = first_row.num_red_potions
-
-    first_row = num_green_potions.first()
-    num_green_potions = first_row.num_green_potions
-
-    first_row = num_blue_potions.first()
-    num_blue_potions = first_row.num_blue_potions
-
-    first_row = gold.first()
+        ml_result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT num_red_ml, num_blue_ml, num_green_ml, gold
+                FROM global_inventory
+                """
+            )
+        )
+    total_ml = 0
+    first_row = ml_result.first()
+    total_ml += first_row.num_red_ml
+    total_ml += first_row.num_green_ml
+    total_ml += first_row.num_blue_ml
     gold = first_row.gold
 
-    potions = num_blue_potions + num_red_potions + num_green_potions
-    ml = num_green_ml + num_red_ml + num_blue_ml
+    with db.engine.begin() as connection:
+        result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT quantity
+                FROM catalog
+                WHERE quantity>0
+                """
+            )
+        )
+        potions = 0
+        for item in result:
+            potions += item.quantity
+   
     #need to add up all the ml, gold and potions
-    return {"number_of_potions": potions, "ml_in_barrels": ml, "gold": gold}
+    return {"number_of_potions": potions, "ml_in_barrels": total_ml, "gold": gold}
 
 class Result(BaseModel):
     gold_match: bool
