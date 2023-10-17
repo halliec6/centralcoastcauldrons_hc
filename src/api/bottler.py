@@ -55,7 +55,10 @@ def get_bottle_plan():
                     "potion_type": potion.potion_type,
                     "quantity": 1
                 })
-
+    print("out of loop in plan")
+    print("red_ml: ", num_red_ml)
+    print("green_ml: ", num_green_ml)
+    print("blue_ml: ", num_blue_ml)
 
     
     return ans
