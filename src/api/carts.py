@@ -81,49 +81,89 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
     print("cart_id: ", cart_id, "cart_checkout: ", cart_checkout)
         
     with db.engine.begin() as connection:
-        connection.execute(
+        #create a transaction:
+        transaction_id = connection.execute(
+            #add the transaction statement first and track the transaction ID ---> need to
             sqlalchemy.text(
                 """
-                UPDATE catalog
-                SET quantity = catalog.quantity - cart_items.quantity
+                INSERT INTO transactions (description, tag)
+                VALUES('cart id - :cart_id', 'CHECKOUT')
+                RETURNING id
+                """
+            ),
+            [{"cart_id": cart_id}])
+        transaction_id = transaction_id.first()[0]
+
+        results = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT *
                 FROM cart_items
-                WHERE catalog.catalog_id = cart_items.catalog_id and cart_items.cart_id = :cart_id
-                
+                LEFT JOIN catalog ON cart_items.catalog_id = catalog.catalog_id
+                WHERE cart_id = :cart_id
                 """
             ),
             [{"cart_id": cart_id}]
         )
-        #also need to update gold amount and return total_potions bought
-        result = connection.execute(
-            sqlalchemy.text(
-                """
-                SELECT cart_items.quantity AS cart_quantity, price
-                FROM catalog
-                JOIN cart_items ON cart_items.catalog_id = catalog.catalog_id
-                WHERE cart_id = :cart_id
 
-                """
-            ),
-            [{"cart_id": cart_id}])
+        
+        #change this
+        # connection.execute(
+        #     sqlalchemy.text(
+        #         """
+        #         UPDATE catalog
+        #         SET quantity = catalog.quantity - cart_items.quantity
+        #         FROM cart_items
+        #         WHERE catalog.catalog_id = cart_items.catalog_id and cart_items.cart_id = :cart_id
+                
+        #         """
+        #     ),
+        #     [{"cart_id": cart_id}]
+        # )
+        
+
+        #also need to update gold amount and return total_potions bought
+        #leave this
+        # result = connection.execute(
+        #     sqlalchemy.text(
+        #         """
+        #         SELECT cart_items.quantity AS cart_quantity, price
+        #         FROM catalog
+        #         JOIN cart_items ON cart_items.catalog_id = catalog.catalog_id
+        #         WHERE cart_id = :cart_id
+
+        #         """
+        #     ),
+        #     [{"cart_id": cart_id}])
         
         gold_spent, total_potions = 0, 0
-        for item in result:
-            gold_spent = item.cart_quantity * item.price
-            total_potions += item.cart_quantity
+
+        for item in results:
+            connection.execute(
+                sqlalchemy.text(
+                    """
+                    INSERT INTO potion_ledger (transaction_id, quantity, catalog_id)
+                    VALUES (:transaction_id, :quantity, :catalog_id)
+                    """
+                ),
+                [{"transaction_id": transaction_id, "quantity": -(item.quantity), "catalog_id": item.catalog_id}]
+            )
+            gold_spent = item.quantity * item.price
+            total_potions += item.quantity
         
+        #change this
         connection.execute(
             sqlalchemy.text(
                 """
-                UPDATE global_inventory
-                SET gold = gold + :gold_spent
+                INSERT INTO gold_ledger(transaction_id, charge)
+                VALUES (:transaction_id, :gold_spent)
                 """
             ),
-            [{"gold_spent": gold_spent}]
+            [{"transaction_id": transaction_id, "gold_spent": gold_spent}]
         )
         print("gold_spent: ", gold_spent)
         print("total_potinos: ", total_potions)
     
-    #add logic for potions bought and gold spent
-   # return("made it")
+
     return {"total_potions_bought": total_potions, "total_gold_paid": gold_spent}
     

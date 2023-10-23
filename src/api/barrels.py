@@ -30,14 +30,26 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     print("\nIn barrels plan") 
     print(wholesale_catalog)
 
-    with db.engine.begin() as connection:
-        result = connection.execute(
-            sqlalchemy.text(
-                "SELECT gold FROM global_inventory"))
+    # with db.engine.begin() as connection:
+    #     result = connection.execute(
+    #         sqlalchemy.text(
+    #             "SELECT gold FROM global_inventory"))
        
-    first_row = result.first()
-    num_gold = first_row.gold
+    # first_row = result.first()
+    # num_gold = first_row.gold
 
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text(
+            """
+            SELECT sum(charge)
+            FROM gold_ledger
+            """
+        ))
+        #gold = result.fetchone()[0]
+        num_gold = result.first()[0]
+        #gold = first_row.result
+
+    print("Total gold:", num_gold)
    
     red_purchase = 0
     green_purchase = 0
@@ -141,16 +153,50 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
         
     print("gold_paid: ", gold_paid, "red_ml: ", red_ml, "green_ml: ", green_ml, "blue_ml: ", blue_ml, "dark_ml: ", dark_ml)
     
+    # with db.engine.begin() as connection:
+    #     connection.execute(
+    #         sqlalchemy.text("""
+    #             UPDATE global_inventory SET 
+    #             gold = gold-:gold_paid,
+    #             num_red_ml = num_red_ml + :red_ml,
+    #             num_green_ml = num_green_ml + :green_ml,
+    #             num_blue_ml = num_blue_ml + :blue_ml
+    #             """),
+    #         [{"gold_paid": gold_paid, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml}]
+    #     )
+
+
+    
+    #is this too much hard coding???
     with db.engine.begin() as connection:
+        transaction_id = connection.execute(
+            #add the transaction statement first and track the transaction ID ---> need to
+            sqlalchemy.text(
+                """
+                INSERT INTO transactions (description, tag)
+                VALUES('spent :gold_paid on :red_ml redml, :green_ml greenml, :blue_ml blueml', 'BARRELS')
+                RETURNING id
+                """
+            ),
+            [{"gold_paid": gold_paid, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml}]).scalar_one()
+        
+
         connection.execute(
+            #add this to both insert statements
+            sqlalchemy.text(
+                """
+                INSERT INTO gold_ledger(transaction_id, charge)
+                VALUES (:transaction_id, :gold_paid )
+                """
+            ),
+            [{"transaction_id": transaction_id, "gold_paid": -gold_paid}],
+        )
+        connection.execute(   
             sqlalchemy.text("""
-                UPDATE global_inventory SET 
-                gold = gold-:gold_paid,
-                num_red_ml = num_red_ml + :red_ml,
-                num_green_ml = num_green_ml + :green_ml,
-                num_blue_ml = num_blue_ml + :blue_ml
+                INSERT INTO ml_ledger(transaction_id, red_ml, green_ml, blue_ml)
+                VALUES (:transaction_id, :red_ml, :green_ml, :blue_ml)
                 """),
-            [{"gold_paid": gold_paid, "red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml}]
+            [{"red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "transaction_id": transaction_id}]
         )
     return "OK"
 

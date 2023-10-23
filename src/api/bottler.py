@@ -23,28 +23,49 @@ def get_bottle_plan():
     """
 
     with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text("SELECT num_red_ml, num_green_ml, num_blue_ml FROM global_inventory"))
-    
-    #read from database red potion amount
-    first_row = result.first()
-    num_red_ml = first_row.num_red_ml
-    num_blue_ml = first_row.num_blue_ml
-    num_green_ml = first_row.num_green_ml
+        result = connection.execute(sqlalchemy.text(
+            """
+            SELECT sum(red_ml)
+            FROM ml_ledger
+            """
+        ))
+        num_red_ml = result.first()[0]
+        
+        result = connection.execute(sqlalchemy.text(
+            """
+            SELECT sum(green_ml)
+            FROM ml_ledger
+            """
+        ))
+        num_green_ml = result.first()[0]
+
+        result = connection.execute(sqlalchemy.text(
+            """
+            SELECT sum(blue_ml)
+            FROM ml_ledger
+            """
+        ))
+        num_blue_ml= result.first()[0]
+
 
     print("\nBottler - Plan")
     print("red_ml: ", num_red_ml)
     print("green_ml: ", num_green_ml)
     print("blue_ml: ", num_blue_ml)
 
+    #change this!!!
     ans = [] 
     with db.engine.begin() as connection:
         catalog  = connection.execute(sqlalchemy.text(
             """
-            SELECT quantity, potion_type
+            SELECT sku, name, COALESCE(SUM(potion_ledger.quantity), 0), price, potion_type
             FROM catalog
+            LEFT JOIN potion_ledger ON catalog.catalog_id = potion_ledger.catalog_id
+            GROUP BY sku, name, price, potion_type
             """
         ))
-    
+        #catalog = sorted(catalog, key = lambda x: x.coalsce)
+        #add some priority for potions  
         for potion in catalog:
             if potion.potion_type[0]<=num_red_ml and potion.potion_type[1]<=num_green_ml and potion.potion_type[2]<=num_blue_ml:
                 num_red_ml -= potion.potion_type[0]
@@ -74,30 +95,71 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
         red_ml = sum(p.quantity * p.potion_type[0] for p in potions_delivered)
         green_ml = sum(p.quantity *p.potion_type[1] for p in potions_delivered)
         blue_ml = sum(p.quantity*p.potion_type[2] for p in potions_delivered)
-        dark_ml = sum(p.quantity * p.potion_type[3] for p in potions_delivered)
+        #dark_ml = sum(p.quantity * p.potion_type[3] for p in potions_delivered)
 
-        for potion_delivered in potions_delivered:
-            connection.execute(
-                sqlalchemy.text(
-                    """
-                    UPDATE catalog 
-                    SET quantity = quantity+ :additional_potions
-                    WHERE potion_type = :potion_type
-                    """
-                ),
-                [{"additional_potions": potion_delivered.quantity,
-                  "potion_type": potion_delivered.potion_type}])
+        # for potion_delivered in potions_delivered:
+        #     connection.execute(
+        #         sqlalchemy.text(
+        #             """
+        #             UPDATE catalog 
+        #             SET quantity = quantity+ :additional_potions
+        #             WHERE potion_type = :potion_type
+        #             """
+        #         ),
+        #         [{"additional_potions": potion_delivered.quantity,
+        #           "potion_type": potion_delivered.potion_type}])
+        
+        # connection.execute(
+        #     sqlalchemy.text(
+        #         """
+        #         UPDATE global_inventory SET
+        #         num_red_ml = num_red_ml - :red_ml,
+        #         num_green_ml = num_green_ml - :green_ml,
+        #         num_blue_ml = num_blue_ml - :blue_ml
+        #         """
+        #     ),
+        #     [{"red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml}])
+        transaction_id = connection.execute(
+            sqlalchemy.text(
+                """
+                INSERT INTO transactions (description, tag)
+                VALUES('MADE POTIONS used :red_ml redml, :green_ml greenml, :blue_ml blueml', 'BOTTLER')
+                RETURNING id
+                """
+            ),
+            [{"red_ml": -red_ml, "green_ml": -green_ml, "blue_ml": -blue_ml}]).scalar_one()
         
         connection.execute(
             sqlalchemy.text(
                 """
-                UPDATE global_inventory SET
-                num_red_ml = num_red_ml - :red_ml,
-                num_green_ml = num_green_ml - :green_ml,
-                num_blue_ml = num_blue_ml - :blue_ml
+                INSERT into ml_ledger (transaction_id, red_ml, blue_ml, green_ml)
+                VALUES(:transaction_id, :red_ml, :green_ml, :blue_ml)
                 """
             ),
-            [{"red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml}])
-    
+            [{"transaction_id": transaction_id, "red_ml": -red_ml, "green_ml": -green_ml, "blue_ml": -blue_ml}]
+        )
+        
+        for potion_delivered in potions_delivered:
+            catalog_id = connection.execute(
+                sqlalchemy.text(
+                    """
+                    SELECT catalog_id from catalog
+                    WHERE potion_type = :potion_type
+                    """
+                ),
+                [{"potion_type": potion_delivered.potion_type}]
+            )
+            
+            #print(catalog_id.first()[0])
+            catalog_id = catalog_id.first()[0]
+            connection.execute(
+                sqlalchemy.text(
+                    """
+                    INSERT INTO potion_ledger(transaction_id, quantity, catalog_id)
+                    VALUES (:transaction_id, :quantity, :catalog_id)
+                    """
+                ),
+                [{"transaction_id": transaction_id, "quantity": potion_delivered.quantity, "catalog_id": catalog_id}]
+            )
     return "OK"
 

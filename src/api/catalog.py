@@ -15,20 +15,22 @@ def get_catalog():
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(
             """
-            SELECT sku, name, quantity, price, potion_type
+            SELECT sku, name, COALESCE(SUM(potion_ledger.quantity), 0), price, potion_type
             FROM catalog
-            WHERE quantity > 0
+            LEFT JOIN potion_ledger ON catalog.catalog_id = potion_ledger.catalog_id
+            GROUP BY sku, name, price, potion_type
             """
         ))
         for item in result:
-            catalog_item = {
-                "sku": item.sku,
-                "name": item.name,
-                "quantity": item.quantity,
-                "price": item.price,
-                "potion_type": item.potion_type,
-            }
-            ans.append(catalog_item)
+            if item.coalesce != 0:
+                catalog_item = {
+                    "sku": item.sku,
+                    "name": item.name,
+                    "quantity": item.coalesce,
+                    "price": item.price,
+                    "potion_type": item.potion_type,
+                }
+                ans.append(catalog_item)
     
     print("in catalog: ", ans)
 
