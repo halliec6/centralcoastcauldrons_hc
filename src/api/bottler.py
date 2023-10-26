@@ -54,7 +54,8 @@ def get_bottle_plan():
     print("blue_ml: ", num_blue_ml)
 
     #change this!!!
-    ans = [] 
+    ans = []
+    hashmap = {} 
     with db.engine.begin() as connection:
         catalog  = connection.execute(sqlalchemy.text(
             """
@@ -65,17 +66,45 @@ def get_bottle_plan():
             """
         ))
         #catalog = sorted(catalog, key = lambda x: x.coalsce)
-        #add some priority for potions  
+        #add some priority for potions
+        #while num_red_ml + num_blue_ml + num_green_ml >= 100:  
+        
+        #fix this to be a loop!
+        potion_catalog = []
         for potion in catalog:
-            if potion.potion_type[0]<=num_red_ml and potion.potion_type[1]<=num_green_ml and potion.potion_type[2]<=num_blue_ml:
-                num_red_ml -= potion.potion_type[0]
-                num_green_ml -= potion.potion_type[1]
-                num_blue_ml -= potion.potion_type[2]
+            potion_catalog.append(potion)
 
-                ans.append({
-                    "potion_type": potion.potion_type,
-                    "quantity": 1
-                })
+        #can access the potion quantity with potion.coalesce
+        #add sorting in descending order 
+        potion_catalog = sorted(potion_catalog, key = lambda item: item.coalesce)
+
+        #potion_catalog = sorted(potion_catalog, key = qu)
+        while(num_red_ml + num_green_ml + num_blue_ml >=100):    
+            for potion in potion_catalog:
+                if potion.potion_type[0]<=num_red_ml and potion.potion_type[1]<=num_green_ml and potion.potion_type[2]<=num_blue_ml:
+                    num_red_ml -= potion.potion_type[0]
+                    num_green_ml -= potion.potion_type[1]
+                    num_blue_ml -= potion.potion_type[2]
+                    
+                    value = hashmap.get(potion.name)
+                    if value is not None:
+                        hashmap[potion.name]["quantity"] = hashmap[potion.name]["quantity"]+1
+                    else:
+                        hashmap[potion.name]= {
+                            "potion_type": potion.potion_type,
+                            "quantity": 1
+                        }
+                    # ans.append({
+                    #     "potion_type": potion.potion_type,
+                    #     "quantity": 1
+                    # })
+        keys = hashmap.keys()
+        for val in keys:
+
+            ans.append({
+                "potion_type": hashmap[val]["potion_type"],
+                "quantity": hashmap[val]["quantity"]
+            })
     print("out of loop in plan")
     print("red_ml: ", num_red_ml)
     print("green_ml: ", num_green_ml)
@@ -132,7 +161,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
         connection.execute(
             sqlalchemy.text(
                 """
-                INSERT into ml_ledger (transaction_id, red_ml, blue_ml, green_ml)
+                INSERT into ml_ledger (transaction_id, red_ml, green_ml, blue_ml)
                 VALUES(:transaction_id, :red_ml, :green_ml, :blue_ml)
                 """
             ),
