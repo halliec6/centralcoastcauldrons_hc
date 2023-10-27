@@ -103,6 +103,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 red_purchase = num_gold//barrel.price
                 if red_purchase>available:
                         red_purchase = available 
+                red_purchase = 0
                 if red_purchase>0:    
                     num_gold = num_gold - (barrel.price * red_purchase)
                     barrel.quantity = barrel.quantity - red_purchase
