@@ -93,6 +93,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     hashmap["SMALL_BLUE_BARREL"]={"quantity": 0} 
 
     bought = True
+    num_gold = num_gold//2
     #need to update this logic to be more efficient
     while num_gold >=100 and bought == True:    
         bought = False
