@@ -93,25 +93,26 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     hashmap["SMALL_BLUE_BARREL"]={"quantity": 0} 
 
     bought = True
+    total_gold = num_gold
     num_gold = num_gold//2
     #need to update this logic to be more efficient
     while num_gold >=100 and bought == True:    
         bought = False
         for barrel in wholesale_catalog:
-            if barrel.sku == 'SMALL_RED_BARREL' and num_red_ml<= num_green_ml and num_red_ml <= num_blue_ml:
+            if barrel.sku == 'SMALL_RED_BARREL':
                 available = barrel.quantity
 
                 red_purchase = num_gold//barrel.price
                 if red_purchase>available:
                         red_purchase = available 
-                red_purchase = 0
-                if red_purchase>0:    
+                if red_purchase>0: 
+                    red_purchase = 1   
                     num_gold = num_gold - (barrel.price * red_purchase)
                     barrel.quantity = barrel.quantity - red_purchase
                     bought = True
                     hashmap["SMALL_RED_BARREL"]["quantity"] = hashmap["SMALL_RED_BARREL"]["quantity"] + red_purchase
                 
-            elif barrel.sku == 'SMALL_GREEN_BARREL' and num_green_ml <= num_red_ml and num_green_ml<= num_blue_ml:
+            elif barrel.sku == 'SMALL_GREEN_BARREL':
                 
                 available = barrel.quantity
 
@@ -120,6 +121,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 if green_purchase>available:
                         green_purchase = available 
                 if green_purchase>0: 
+                    green_purchase = 1
                     num_gold = num_gold - (barrel.price * green_purchase)
                     barrel.quantity = barrel.quantity - green_purchase
                     bought = True
@@ -134,7 +136,8 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 if blue_purchase>available:
                         blue_purchase = available 
                 
-                if blue_purchase>0:                        
+                if blue_purchase>0: 
+                    blue_purchase = 1                       
                     num_gold = num_gold - (barrel.price * blue_purchase)
                     barrel.quantity = barrel.quantity - blue_purchase
                     bought = True
@@ -146,7 +149,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     print("- sku: SMALL_RED_BARREL    Quantity: ", hashmap["SMALL_RED_BARREL"]["quantity"])
     print("- sku: SMALL_GREEN_BARREL  Quantity: ", hashmap["SMALL_GREEN_BARREL"]["quantity"])
     print("- sku: SMALL_BLUE_BARREL   Quantity: ", hashmap["SMALL_BLUE_BARREL"]["quantity"])
-    print("gold remaining: ", num_gold)
+    print("gold remaining: ", total_gold - num_gold)
 
     ans = []
 
