@@ -94,44 +94,42 @@ def search_orders(
         stmt = stmt.where(db.cart.c.str.ilike(f"%{customer_name}%"))
     if potion_sku != "":
         stmt = stmt.where(db.catalog.c.sku.ilike(f"%{potion_sku}%"))
-    #need to add typing in potion
     
+    
+    if search_page == "":
+        search_page =1
+    else:
+        search_page = int(search_page)
+    page_range_upper = (search_page*5)+ 1
+    page_range_lower = page_range_upper-5
+
     with db.engine.connect() as conn:
         result = conn.execute(stmt)
-        json = []
-        i = 0
+        list = []
+        i = 1
        
         for row in result:
             quantity = row.quantity
             name = row.item
             item_sku = str(quantity)+ " " +name
             
-            json.append(
-                {
-                    "line_item_id": i,
-                    "item_sku": item_sku,
-                    "customer_name": row.customer,
-                    "line_item_total": row.gold,
-                    "timestamp": row.time
-                }
-            )
+            if i>=page_range_lower and i<page_range_upper:
+                list.append(
+                    {
+                        "line_item_id": i,
+                        "item_sku": item_sku,
+                        "customer_name": row.customer,
+                        "line_item_total": row.gold,
+                        "timestamp": row.time
+                    }
+                )
             i = i+1
-    return json
 
-
-    return {
-        "previous": "",
-        "next": "",
-        "results": [
-            {
-                "line_item_id": 1,
-                "item_sku": "1 oblivion potion",
-                "customer_name": "Scaramouche",
-                "line_item_total": 50,
-                "timestamp": "2021-01-01T00:00:00Z",
-            }
-        ],
-    }
+        return {
+            "previous": page_range_lower-1,
+            "next": page_range_upper+1,
+            "results": list,
+        }
 
 class NewCart(BaseModel):
     customer: str
