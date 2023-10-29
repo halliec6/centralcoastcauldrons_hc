@@ -52,6 +52,72 @@ def search_orders(
     Your results must be paginated, the max results you can return at any
     time is 5 total line items.
     """
+    
+    
+    if sort_col is search_sort_options.customer_name:
+        order_by = db.cart.c.str
+    elif sort_col is search_sort_options.item_sku:
+        order_by = db.catalog.c.sku
+    elif sort_col is search_sort_options.line_item_total:
+        order_by = db.gold_ledger.c.charge
+    else:
+        order_by = db.transactions.c.created_at
+    
+    if sort_order == search_sort_order.desc:
+        order_by = order_by.desc()
+    else:
+        order_by = order_by.asc()
+    
+    stmt = (
+        sqlalchemy.select(
+            db.transactions.c.id,
+            db.cart.c.str.label("customer"),
+            db.catalog.c.sku.label("item"),
+            db.cart_items.c.quantity,
+            db.gold_ledger.c.charge.label("gold"),
+            db.transactions.c.created_at.label("time")
+        )
+        .select_from(db.transactions
+            .join(db.gold_ledger, db.transactions.c.id == db.gold_ledger.c.transaction_id)
+            .join(db.cart, db.transactions.c.cart_id == db.cart.c.cart_id)
+            .join(db.potion_ledger, db.transactions.c.id == db.potion_ledger.c.transaction_id)
+            .join(db.catalog, db.potion_ledger.c.catalog_id == db.catalog.c.catalog_id)
+            .join(db.cart_items, db.cart.c.cart_id == db.cart_items.c.cart_id)
+        )
+        .where(db.transactions.c.tag == 'CHECKOUT')
+        .order_by(order_by)
+    )
+
+    # filter only if name parameter is passed
+    if customer_name != "":
+        #need to change to not be case sensitive
+        stmt = stmt.where(db.cart.c.str.ilike(f"%{customer_name}%"))
+    if potion_sku != "":
+        stmt = stmt.where(db.catalog.c.sku.ilike(f"%{potion_sku}%"))
+    #need to add typing in potion
+    
+    with db.engine.connect() as conn:
+        result = conn.execute(stmt)
+        json = []
+        i = 0
+       
+        for row in result:
+            quantity = row.quantity
+            name = row.item
+            item_sku = str(quantity)+ " " +name
+            
+            json.append(
+                {
+                    "line_item_id": i,
+                    "item_sku": item_sku,
+                    "customer_name": row.customer,
+                    "line_item_total": row.gold,
+                    "timestamp": row.time
+                }
+            )
+            i = i+1
+    return json
+
 
     return {
         "previous": "",
@@ -133,8 +199,8 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
         transaction_id = connection.execute(
             sqlalchemy.text(
                 """
-                INSERT INTO transactions (description, tag)
-                VALUES('cart id - :cart_id', 'CHECKOUT')
+                INSERT INTO transactions (description, tag, cart_id)
+                VALUES('cart id - :cart_id', 'CHECKOUT', :cart_id)
                 RETURNING id
                 """
             ),
@@ -152,37 +218,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             ),
             [{"cart_id": cart_id}]
         )
-
-        
-        #change this
-        # connection.execute(
-        #     sqlalchemy.text(
-        #         """
-        #         UPDATE catalog
-        #         SET quantity = catalog.quantity - cart_items.quantity
-        #         FROM cart_items
-        #         WHERE catalog.catalog_id = cart_items.catalog_id and cart_items.cart_id = :cart_id
-                
-        #         """
-        #     ),
-        #     [{"cart_id": cart_id}]
-        # )
-        
-
-        #also need to update gold amount and return total_potions bought
-        #leave this
-        # result = connection.execute(
-        #     sqlalchemy.text(
-        #         """
-        #         SELECT cart_items.quantity AS cart_quantity, price
-        #         FROM catalog
-        #         JOIN cart_items ON cart_items.catalog_id = catalog.catalog_id
-        #         WHERE cart_id = :cart_id
-
-        #         """
-        #     ),
-        #     [{"cart_id": cart_id}])
-        
+      
         gold_spent, total_potions = 0, 0
 
         for item in results:
