@@ -126,8 +126,8 @@ def search_orders(
             i = i+1
 
         return {
-            "previous": page_range_lower-1,
-            "next": page_range_upper,
+            "previous": max(1, search_page-1),
+            "next": search_page+1,
             "results": list,
         }
 
