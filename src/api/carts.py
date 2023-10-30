@@ -127,7 +127,7 @@ def search_orders(
 
         return {
             "previous": page_range_lower-1,
-            "next": page_range_upper+1,
+            "next": page_range_upper,
             "results": list,
         }
 
