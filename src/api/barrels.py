@@ -90,13 +90,64 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     hashmap["SMALL_RED_BARREL"]={"quantity": 0} 
     hashmap["SMALL_GREEN_BARREL"]={"quantity": 0} 
     hashmap["SMALL_BLUE_BARREL"]={"quantity": 0} 
+    hashmap["MEDIUM_RED_BARREL"]={"quantity": 0} 
+    hashmap["MEDIUM_GREEN_BARREL"]={"quantity": 0} 
+    hashmap["MEDIUM_BLUE_BARREL"]={"quantity": 0} 
 
     bought = True
     total_gold = num_gold
     #num_gold = num_gold//2
     #need to update this logic to be more efficient
-    while num_gold >=100 and bought == True:    
+    while num_gold >=250 and bought == True:    
         bought = False
+        for barrel in wholesale_catalog:
+            if barrel.sku == 'MEDIUM_RED_BARREL':
+                available = barrel.quantity
+
+                red_purchase = num_gold//barrel.price
+                if red_purchase>available:
+                        red_purchase = available 
+                if red_purchase>0: 
+                    red_purchase = 1   
+                    num_gold = num_gold - (barrel.price * red_purchase)
+                    barrel.quantity = barrel.quantity - red_purchase
+                    bought = True
+                    hashmap["MEDIUM_RED_BARREL"]["quantity"] = hashmap["MEDIUM_RED_BARREL"]["quantity"] + red_purchase
+                
+            elif barrel.sku == 'MEDIUM_GREEN_BARREL':
+                
+                available = barrel.quantity
+
+                green_purchase = num_gold//barrel.price 
+                
+                if green_purchase>available:
+                        green_purchase = available 
+                if green_purchase>0: 
+                    green_purchase = 1
+                    num_gold = num_gold - (barrel.price * green_purchase)
+                    barrel.quantity = barrel.quantity - green_purchase
+                    bought = True
+                    hashmap["MEDIUM_GREEN_BARREL"]["quantity"] = hashmap["MEDIUM_GREEN_BARREL"]["quantity"] + green_purchase
+
+
+            elif barrel.sku == 'MEDIUM_BLUE_BARREL':
+                available = barrel.quantity
+
+                blue_purchase = num_gold//barrel.price 
+                
+                if blue_purchase>available:
+                        blue_purchase = available 
+                
+                if blue_purchase>0: 
+                    blue_purchase = 1                       
+                    num_gold = num_gold - (barrel.price * blue_purchase)
+                    barrel.quantity = barrel.quantity - blue_purchase
+                    bought = True
+                    hashmap["MEDIUM_BLUE_BARREL"]["quantity"] = hashmap["MEDIUM_BLUE_BARREL"]["quantity"] + blue_purchase
+
+    bought = True       
+    while num_gold >=100 and bought == True:    
+        bought = False        
         for barrel in wholesale_catalog:
             if barrel.sku == 'SMALL_RED_BARREL':
                 available = barrel.quantity
@@ -145,6 +196,10 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 
 
     print("\nreturn values:")
+
+    print("- sku: MEDIUM_RED_BARREL    Quantity: ", hashmap["MEDIUM_RED_BARREL"]["quantity"])
+    print("- sku: MEDIUM_GREEN_BARREL  Quantity: ", hashmap["MEDIUM_GREEN_BARREL"]["quantity"])
+    print("- sku: MEDIUM_BLUE_BARREL   Quantity: ", hashmap["MEDIUM_BLUE_BARREL"]["quantity"])
     print("- sku: SMALL_RED_BARREL    Quantity: ", hashmap["SMALL_RED_BARREL"]["quantity"])
     print("- sku: SMALL_GREEN_BARREL  Quantity: ", hashmap["SMALL_GREEN_BARREL"]["quantity"])
     print("- sku: SMALL_BLUE_BARREL   Quantity: ", hashmap["SMALL_BLUE_BARREL"]["quantity"])
@@ -169,6 +224,24 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             "quantity": hashmap["SMALL_BLUE_BARREL"]["quantity"]
         }
         )
+
+    if hashmap["MEDIUM_RED_BARREL"]["quantity"]>0:
+        ans.append({
+            "sku": "MEDIUM_RED_BARREL",
+            "quantity": hashmap["MEDIUM_RED_BARREL"]["quantity"],
+        })
+    if hashmap["MEDIUM_GREEN_BARREL"]["quantity"]>0:
+        ans.append({
+            "sku": "MEDIUM_GREEN_BARREL",
+            "quantity": hashmap["MEDIUM_GREEN_BARREL"]["quantity"]
+        })
+    if hashmap["MEDIUM_BLUE_BARREL"]["quantity"]>0:
+        ans.append(
+        {
+            "sku": "MEDIUM_BLUE_BARREL",
+            "quantity": hashmap["MEDIUM_BLUE_BARREL"]["quantity"]
+        }
+        )
     print("return value of bbarrels plan: ", ans)
     return ans
 
@@ -181,11 +254,11 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 
     for barrel_delivered in barrels_delivered:
         gold_paid+= barrel_delivered.price*barrel_delivered.quantity
-        if barrel_delivered.sku == "SMALL_RED_BARREL":
+        if barrel_delivered.sku == "SMALL_RED_BARREL" or barrel_delivered.sku == "MEDIUM_RED_BARREL":
             red_ml += barrel_delivered.ml_per_barrel *barrel_delivered.quantity
-        elif barrel_delivered.sku == "SMALL_GREEN_BARREL":
+        elif barrel_delivered.sku == "SMALL_GREEN_BARREL" or barrel_delivered.sku == "MEDIUM_GREEN_BARREL":
             green_ml += barrel_delivered.ml_per_barrel *barrel_delivered.quantity
-        elif barrel_delivered.sku == "SMALL_BLUE_BARREL":
+        elif barrel_delivered.sku == "SMALL_BLUE_BARREL" or barrel_delivered.sku == "MEDIUM_BLUE_BARREL":
             blue_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
         elif barrel_delivered.potion_type == [0, 0, 0, 100]:
             dark_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
