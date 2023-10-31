@@ -4,7 +4,6 @@ from src.api import auth
 import sqlalchemy
 from src import database as db
 
-#status: functions with all colors, seems to be working fully, need to push to girhub
 router = APIRouter(
     prefix="/barrels",
     tags=["barrels"],
@@ -94,7 +93,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
     bought = True
     total_gold = num_gold
-    num_gold = num_gold//2
+    #num_gold = num_gold//2
     #need to update this logic to be more efficient
     while num_gold >=100 and bought == True:    
         bought = False
