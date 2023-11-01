@@ -150,8 +150,8 @@ def create_cart(new_cart: NewCart):
                 """
             ),
             [{"new_cart_str": new_cart.customer}])
-    first_row = id.first()
-    id = first_row.cart_id
+        first_row = id.first()
+        id = first_row.cart_id
     return {"cart_id": id}
 
 @router.get("/{cart_id}")
