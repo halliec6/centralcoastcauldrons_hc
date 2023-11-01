@@ -65,26 +65,32 @@ def get_bottle_plan():
             GROUP BY sku, name, price, potion_type
             """
         ))
-        #catalog = sorted(catalog, key = lambda x: x.coalsce)
-        #add some priority for potions
-        #while num_red_ml + num_blue_ml + num_green_ml >= 100:  
-        
-        #fix this to be a loop!
+
         potion_catalog = []
         for potion in catalog:
             potion_catalog.append(potion)
-
+        
         #can access the potion quantity with potion.coalesce
         #add sorting in descending order 
         potion_catalog = sorted(potion_catalog, key = lambda item: item.coalesce)
 
+        total_potions = connection.execute(sqlalchemy.text(
+            """
+            select sum(coalesce(potion_ledger.quantity, 0)) as total_potion_sum
+            from catalog
+            left join potion_ledger on catalog.catalog_id = potion_ledger.catalog_id
+            """
+        ))
+        total_potions = total_potions.first()[0]
+
         #potion_catalog = sorted(potion_catalog, key = qu)
-        while(num_red_ml + num_green_ml + num_blue_ml >=100):    
+        while(num_red_ml + num_green_ml + num_blue_ml >=100) and total_potions<300:    
             for potion in potion_catalog:
-                if potion.potion_type[0]<=num_red_ml and potion.potion_type[1]<=num_green_ml and potion.potion_type[2]<=num_blue_ml:
+                if potion.potion_type[0]<=num_red_ml and potion.potion_type[1]<=num_green_ml and potion.potion_type[2]<=num_blue_ml and total_potions<300:
                     num_red_ml -= potion.potion_type[0]
                     num_green_ml -= potion.potion_type[1]
                     num_blue_ml -= potion.potion_type[2]
+                    total_potions = total_potions+1
                     
                     value = hashmap.get(potion.name)
                     if value is not None:
@@ -110,7 +116,7 @@ def get_bottle_plan():
     print("green_ml: ", num_green_ml)
     print("blue_ml: ", num_blue_ml)
 
-    
+    print(ans)
     return ans
 
 @router.post("/deliver")
