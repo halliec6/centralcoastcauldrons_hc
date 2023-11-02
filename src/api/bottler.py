@@ -116,6 +116,7 @@ def get_bottle_plan():
         print("red_ml: ", num_red_ml)
         print("green_ml: ", num_green_ml)
         print("blue_ml: ", num_blue_ml)
+        print("total_potions: ", total_potions)
 
         print(ans)
         return ans
@@ -131,30 +132,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
         red_ml = sum(p.quantity * p.potion_type[0] for p in potions_delivered)
         green_ml = sum(p.quantity *p.potion_type[1] for p in potions_delivered)
         blue_ml = sum(p.quantity*p.potion_type[2] for p in potions_delivered)
-        #dark_ml = sum(p.quantity * p.potion_type[3] for p in potions_delivered)
-
-        # for potion_delivered in potions_delivered:
-        #     connection.execute(
-        #         sqlalchemy.text(
-        #             """
-        #             UPDATE catalog 
-        #             SET quantity = quantity+ :additional_potions
-        #             WHERE potion_type = :potion_type
-        #             """
-        #         ),
-        #         [{"additional_potions": potion_delivered.quantity,
-        #           "potion_type": potion_delivered.potion_type}])
         
-        # connection.execute(
-        #     sqlalchemy.text(
-        #         """
-        #         UPDATE global_inventory SET
-        #         num_red_ml = num_red_ml - :red_ml,
-        #         num_green_ml = num_green_ml - :green_ml,
-        #         num_blue_ml = num_blue_ml - :blue_ml
-        #         """
-        #     ),
-        #     [{"red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml}])
         transaction_id = connection.execute(
             sqlalchemy.text(
                 """
@@ -197,5 +175,5 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
                 ),
                 [{"transaction_id": transaction_id, "quantity": potion_delivered.quantity, "catalog_id": catalog_id}]
             )
-    return "OK"
+        return "OK"
 
