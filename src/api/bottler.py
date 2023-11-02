@@ -82,7 +82,8 @@ def get_bottle_plan():
             """
         ))
         total_potions = total_potions.first()[0]
-
+        
+        print("total potions: ", total_potions)
         #potion_catalog = sorted(potion_catalog, key = qu)
         while(num_red_ml + num_green_ml + num_blue_ml >=100) and total_potions<300:    
             for potion in potion_catalog:
@@ -91,7 +92,7 @@ def get_bottle_plan():
                     num_green_ml -= potion.potion_type[1]
                     num_blue_ml -= potion.potion_type[2]
                     total_potions = total_potions+1
-                    
+
                     value = hashmap.get(potion.name)
                     if value is not None:
                         hashmap[potion.name]["quantity"] = hashmap[potion.name]["quantity"]+1
@@ -111,13 +112,13 @@ def get_bottle_plan():
                 "potion_type": hashmap[val]["potion_type"],
                 "quantity": hashmap[val]["quantity"]
             })
-    print("out of loop in plan")
-    print("red_ml: ", num_red_ml)
-    print("green_ml: ", num_green_ml)
-    print("blue_ml: ", num_blue_ml)
+        print("out of loop in plan")
+        print("red_ml: ", num_red_ml)
+        print("green_ml: ", num_green_ml)
+        print("blue_ml: ", num_blue_ml)
 
-    print(ans)
-    return ans
+        print(ans)
+        return ans
 
 @router.post("/deliver")
 def post_deliver_bottles(potions_delivered: list[PotionInventory]):
