@@ -152,7 +152,7 @@ def create_cart(new_cart: NewCart):
             [{"new_cart_str": new_cart.customer}])
         first_row = id.first()
         id = first_row.cart_id
-    return {"cart_id": id}
+        return {"cart_id": id}
 
 @router.get("/{cart_id}")
 def get_cart(cart_id: int):
@@ -182,7 +182,7 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
         [{"cart_id": cart_id, "quantity": cart_item.quantity, "item_sku": item_sku}]
         )
 
-    return {"Success": True}
+        return {"Success": True}
 
 class CartCheckout(BaseModel):
     payment: str
@@ -246,5 +246,5 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
         print("total_potinos: ", total_potions)
     
 
-    return {"total_potions_bought": total_potions, "total_gold_paid": gold_spent}
+        return {"total_potions_bought": total_potions, "total_gold_paid": gold_spent}
     
