@@ -130,7 +130,6 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 if green_purchase>available:
                         green_purchase = available 
                 
-                green_purchase = 0
                 
                 if green_purchase>0: 
                     green_purchase = 1
@@ -181,7 +180,6 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 if green_purchase>available:
                         green_purchase = available 
 
-                green_purchase = 0
                 if green_purchase>0: 
                     green_purchase = 1
                     num_gold = num_gold - (barrel.price * green_purchase)
