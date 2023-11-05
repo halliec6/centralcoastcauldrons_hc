@@ -82,18 +82,22 @@ def get_bottle_plan():
             """
         ))
         total_potions = total_potions.first()[0]
+
         
         print("total potions: ", total_potions)
         #potion_catalog = sorted(potion_catalog, key = qu)
-        while(num_red_ml + num_green_ml + num_blue_ml >=100) and total_potions<300:    
+        bought = True
+        while(num_red_ml + num_green_ml + num_blue_ml >=100) and total_potions<300 and bought == True:    
+            bought = False
             for potion in potion_catalog:
-                if potion.potion_type[0]<=num_red_ml and potion.potion_type[1]<=num_green_ml and potion.potion_type[2]<=num_blue_ml and total_potions<300 :
+                if potion.potion_type[0]<=num_red_ml and potion.potion_type[1]<=num_green_ml and potion.potion_type[2]<=num_blue_ml and total_potions<300 and potion.coalesce<=63:
                     num_red_ml -= potion.potion_type[0]
                     num_green_ml -= potion.potion_type[1]
                     num_blue_ml -= potion.potion_type[2]
                     total_potions = total_potions+1
 
                     value = hashmap.get(potion.name)
+                    bought = True
                     if value is not None:
                         hashmap[potion.name]["quantity"] = hashmap[potion.name]["quantity"]+1
                     else:
