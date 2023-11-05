@@ -87,7 +87,7 @@ def get_bottle_plan():
         #potion_catalog = sorted(potion_catalog, key = qu)
         while(num_red_ml + num_green_ml + num_blue_ml >=100) and total_potions<300:    
             for potion in potion_catalog:
-                if potion.potion_type[0]<=num_red_ml and potion.potion_type[1]<=num_green_ml and potion.potion_type[2]<=num_blue_ml and total_potions<300 and potion.potion_type != [50, 0, 50, 0]:
+                if potion.potion_type[0]<=num_red_ml and potion.potion_type[1]<=num_green_ml and potion.potion_type[2]<=num_blue_ml and total_potions<300 :
                     num_red_ml -= potion.potion_type[0]
                     num_green_ml -= potion.potion_type[1]
                     num_blue_ml -= potion.potion_type[2]
