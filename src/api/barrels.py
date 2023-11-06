@@ -154,54 +154,55 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     bought = True
                     hashmap["MEDIUM_BLUE_BARREL"]["quantity"] = hashmap["MEDIUM_BLUE_BARREL"]["quantity"] + blue_purchase
 
-    bought = True       
-    while num_gold >=100 and bought == True:    
-        bought = False        
-        for barrel in wholesale_catalog:
-            if barrel.sku == 'SMALL_RED_BARREL':
-                available = barrel.quantity
+    bought = True
+    if num_blue_ml +num_red_ml + num_green_ml <  10000:    
+        while num_gold >=100 and bought == True:    
+            bought = False        
+            for barrel in wholesale_catalog:
+                if barrel.sku == 'SMALL_RED_BARREL':
+                    available = barrel.quantity
 
-                red_purchase = num_gold//barrel.price
-                if red_purchase>available:
-                        red_purchase = available 
-                if red_purchase>0: 
-                    red_purchase = 1   
-                    num_gold = num_gold - (barrel.price * red_purchase)
-                    barrel.quantity = barrel.quantity - red_purchase
-                    bought = True
-                    hashmap["SMALL_RED_BARREL"]["quantity"] = hashmap["SMALL_RED_BARREL"]["quantity"] + red_purchase
-                
-            elif barrel.sku == 'SMALL_GREEN_BARREL':
-                
-                available = barrel.quantity
+                    red_purchase = num_gold//barrel.price
+                    if red_purchase>available:
+                            red_purchase = available 
+                    if red_purchase>0: 
+                        red_purchase = 1   
+                        num_gold = num_gold - (barrel.price * red_purchase)
+                        barrel.quantity = barrel.quantity - red_purchase
+                        bought = True
+                        hashmap["SMALL_RED_BARREL"]["quantity"] = hashmap["SMALL_RED_BARREL"]["quantity"] + red_purchase
+                    
+                elif barrel.sku == 'SMALL_GREEN_BARREL':
+                    
+                    available = barrel.quantity
 
-                green_purchase = num_gold//barrel.price 
-                
-                if green_purchase>available:
-                        green_purchase = available 
+                    green_purchase = num_gold//barrel.price 
+                    
+                    if green_purchase>available:
+                            green_purchase = available 
 
-                if green_purchase>0: 
-                    green_purchase = 1
-                    num_gold = num_gold - (barrel.price * green_purchase)
-                    barrel.quantity = barrel.quantity - green_purchase
-                    bought = True
-                    hashmap["SMALL_GREEN_BARREL"]["quantity"] = hashmap["SMALL_GREEN_BARREL"]["quantity"] + green_purchase
+                    if green_purchase>0: 
+                        green_purchase = 1
+                        num_gold = num_gold - (barrel.price * green_purchase)
+                        barrel.quantity = barrel.quantity - green_purchase
+                        bought = True
+                        hashmap["SMALL_GREEN_BARREL"]["quantity"] = hashmap["SMALL_GREEN_BARREL"]["quantity"] + green_purchase
 
 
-            elif barrel.sku == 'SMALL_BLUE_BARREL':
-                available = barrel.quantity
+                elif barrel.sku == 'SMALL_BLUE_BARREL':
+                    available = barrel.quantity
 
-                blue_purchase = num_gold//barrel.price 
-                
-                if blue_purchase>available:
-                        blue_purchase = available 
-                
-                if blue_purchase>0: 
-                    blue_purchase = 1                       
-                    num_gold = num_gold - (barrel.price * blue_purchase)
-                    barrel.quantity = barrel.quantity - blue_purchase
-                    bought = True
-                    hashmap["SMALL_BLUE_BARREL"]["quantity"] = hashmap["SMALL_BLUE_BARREL"]["quantity"] + blue_purchase
+                    blue_purchase = num_gold//barrel.price 
+                    
+                    if blue_purchase>available:
+                            blue_purchase = available 
+                    
+                    if blue_purchase>0: 
+                        blue_purchase = 1                       
+                        num_gold = num_gold - (barrel.price * blue_purchase)
+                        barrel.quantity = barrel.quantity - blue_purchase
+                        bought = True
+                        hashmap["SMALL_BLUE_BARREL"]["quantity"] = hashmap["SMALL_BLUE_BARREL"]["quantity"] + blue_purchase
 
                 
 
