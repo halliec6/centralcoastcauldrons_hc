@@ -101,8 +101,8 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
 
 
-    # if num_red_ml + num_blue_ml + num_green_ml >(100*300)/2:
-    #      num_gold = 0
+    if num_gold > 1500:
+        num_gold = 15000
     #need to update this logic to be more efficient
     while num_gold >=250 and bought == True:    
         bought = False
@@ -138,20 +138,20 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     hashmap["MEDIUM_GREEN_BARREL"]["quantity"] = hashmap["MEDIUM_GREEN_BARREL"]["quantity"] + green_purchase
 
 
-            # elif barrel.sku == 'MEDIUM_BLUE_BARREL':
-            #     available = barrel.quantity
+            elif barrel.sku == 'MEDIUM_BLUE_BARREL':
+                available = barrel.quantity
 
-            #     blue_purchase = num_gold//barrel.price 
+                blue_purchase = num_gold//barrel.price 
                 
-            #     if blue_purchase>available:
-            #             blue_purchase = available 
+                if blue_purchase>available:
+                        blue_purchase = available 
                 
-            #     if blue_purchase>0: 
-            #         blue_purchase = 1                       
-            #         num_gold = num_gold - (barrel.price * blue_purchase)
-            #         barrel.quantity = barrel.quantity - blue_purchase
-            #         bought = True
-            #         hashmap["MEDIUM_BLUE_BARREL"]["quantity"] = hashmap["MEDIUM_BLUE_BARREL"]["quantity"] + blue_purchase
+                if blue_purchase>0: 
+                    blue_purchase = 1                       
+                    num_gold = num_gold - (barrel.price * blue_purchase)
+                    barrel.quantity = barrel.quantity - blue_purchase
+                    bought = True
+                    hashmap["MEDIUM_BLUE_BARREL"]["quantity"] = hashmap["MEDIUM_BLUE_BARREL"]["quantity"] + blue_purchase
 
     # bought = True
     # if num_blue_ml +num_red_ml + num_green_ml <  10000:    
