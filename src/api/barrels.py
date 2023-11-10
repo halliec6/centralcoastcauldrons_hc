@@ -102,7 +102,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
 
     if num_gold > 1500:
-        num_gold = 6000
+        num_gold = 12000
     #need to update this logic to be more efficient
     while num_gold >=250 and bought == True:    
         bought = False
