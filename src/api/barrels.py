@@ -101,8 +101,10 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
 
 
-    if num_gold > 1500:
+    if num_red_ml + num_blue_ml + num_green_ml <=1000:
         num_gold = 12000
+    else:
+        num_gold= 0
     #need to update this logic to be more efficient
     while num_gold >=250 and bought == True:    
         bought = False
